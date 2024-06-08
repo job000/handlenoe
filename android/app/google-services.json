@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "707520837275",
+    "project_id": "handlenoe",
+    "storage_bucket": "handlenoe.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:707520837275:android:2187b72433c806d8b9383e",
+        "android_client_info": {
+          "package_name": "handlenoe.firebaseapp.com"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-cmQN6tUzME3pGGChK2q-sbgnfq5lCPI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
