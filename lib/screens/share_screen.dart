@@ -6,7 +6,8 @@ import '../providers/auth_provider.dart';
 import '../models/shopping_list_model.dart';
 
 class ShareScreen extends StatefulWidget {
-  const ShareScreen({Key? key, required String listId}) : super(key: key);
+  final String listId;
+  const ShareScreen({Key? key, required this.listId}) : super(key: key);
 
   @override
   _ShareScreenState createState() => _ShareScreenState();
@@ -19,7 +20,9 @@ class _ShareScreenState extends State<ShareScreen> {
 
   void _shareList() async {
     if (_selectedListId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please select a list to share')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a list to share')),
+      );
       return;
     }
 
@@ -30,9 +33,13 @@ class _ShareScreenState extends State<ShareScreen> {
     try {
       await Provider.of<ShoppingListProvider>(context, listen: false)
           .shareListWithUserByEmail(_selectedListId!, _emailController.text);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('List shared successfully')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('List shared successfully')),
+      );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to share list')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to share list')),
+      );
     } finally {
       setState(() {
         _isLoading = false;
@@ -58,10 +65,17 @@ class _ShareScreenState extends State<ShareScreen> {
                   StreamBuilder<List<ShoppingList>>(
                     stream: shoppingListProvider.getShoppingListsStream(userId),
                     builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       }
-                      final shoppingLists = snapshot.data ?? [];
+                      if (snapshot.hasError) {
+                        return const Center(child: Text('Error loading lists'));
+                      }
+                      if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text('No lists available'));
+                      }
+
+                      final shoppingLists = snapshot.data!;
                       return DropdownButton<String>(
                         hint: const Text('Select a list to share'),
                         value: _selectedListId,
@@ -94,7 +108,7 @@ class _ShareScreenState extends State<ShareScreen> {
                   const SizedBox(height: 20),
                   Expanded(
                     child: StreamBuilder<QuerySnapshot>(
-                      stream: (_emailController.text.isNotEmpty)
+                      stream: _emailController.text.isNotEmpty
                           ? FirebaseFirestore.instance
                               .collection('users')
                               .where('email', isGreaterThanOrEqualTo: _emailController.text)
@@ -102,9 +116,16 @@ class _ShareScreenState extends State<ShareScreen> {
                               .snapshots()
                           : const Stream.empty(),
                       builder: (context, snapshot) {
-                        if (!snapshot.hasData) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
                           return const Center(child: CircularProgressIndicator());
                         }
+                        if (snapshot.hasError) {
+                          return const Center(child: Text('Error loading users'));
+                        }
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Center(child: Text('No users found'));
+                        }
+
                         final users = snapshot.data!.docs;
                         return ListView.builder(
                           itemCount: users.length,

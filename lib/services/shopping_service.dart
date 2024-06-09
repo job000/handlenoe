@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:rxdart/rxdart.dart'; // Add this import
+import 'package:rxdart/rxdart.dart';
 import '../models/shopping_list_model.dart';
 import '../models/shopping_item_model.dart';
 
@@ -36,7 +36,8 @@ class ShoppingService {
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => ShoppingList.fromDocument(doc)).toList());
 
-    return CombineLatestStream.list([ownedListsStream, sharedListsStream]).map((lists) => lists.expand((list) => list).toList());
+    return CombineLatestStream.list([ownedListsStream, sharedListsStream])
+        .map((lists) => lists.expand((list) => list).toList());
   }
 
   Stream<QuerySnapshot> getItemsForListStream(String listId) {
