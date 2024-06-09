@@ -7,8 +7,10 @@ import '../services/shopping_service.dart';
 class ShoppingListProvider with ChangeNotifier {
   final ShoppingService _shoppingService = ShoppingService();
   List<ShoppingList> _shoppingLists = [];
+  bool _notificationsEnabled = false;
 
   List<ShoppingList> get shoppingLists => _shoppingLists;
+  bool get notificationsEnabled => _notificationsEnabled;
 
   Future<void> fetchShoppingLists(String userId) async {
     _shoppingLists = await _shoppingService.getShoppingLists(userId);
@@ -63,6 +65,23 @@ class ShoppingListProvider with ChangeNotifier {
 
   Future<void> toggleNotifications(String listId, bool enable) async {
     await _shoppingService.toggleNotifications(listId, enable);
+    _notificationsEnabled = enable;
     notifyListeners();
+  }
+
+  bool notificationsEnabledForList(String listId) {
+    final list = _shoppingLists.firstWhere(
+      (list) => list.id == listId,
+      orElse: () => ShoppingList(
+        id: '', 
+        name: '', 
+        owner: '', 
+        ownerEmail: '', // Add ownerEmail parameter here
+        items: [], 
+        sharedWith: [], 
+        notificationsEnabled: false,
+      ),
+    );
+    return list.notificationsEnabled;
   }
 }
