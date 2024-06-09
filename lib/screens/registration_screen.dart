@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../services/auth_service.dart';
-import '../utils/validators.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart';
+import '../utils/validators.dart';
 import '../widgets/loading_indicator.dart';
-import 'home_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -19,30 +18,28 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  final AuthService _authService = AuthService();
 
   void _register() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
       });
-      User? user = await _authService.register(_emailController.text, _passwordController.text);
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-      if (user != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to register')),
-        );
-      }
+      await Provider.of<AuthProvider>(context, listen: false)
+          .register(_emailController.text, _passwordController.text);
+      setState(() {
+        _isLoading = false;
+      });
     }
+  }
+
+  void _googleSignIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await Provider.of<AuthProvider>(context, listen: false).registerWithGoogle();
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -53,11 +50,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       ),
       body: _isLoading
           ? const LoadingIndicator()
-          : Padding(
+          : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 key: _formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     CustomTextField(
                       hintText: 'Email',
@@ -77,6 +75,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     CustomButton(
                       text: 'Register',
                       onPressed: _register,
+                    ),
+                    const SizedBox(height: 16.0),
+                    CustomButton(
+                      text: 'Register with Google',
+                      onPressed: _googleSignIn,
+                    ),
+                    const SizedBox(height: 16.0),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text('Back to Login'),
                     ),
                   ],
                 ),

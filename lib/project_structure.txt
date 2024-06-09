@@ -1,0 +1,39 @@
+lib/
+│
+├── models/
+│   ├── shopping_item_model.dart
+│   ├── shopping_list_model.dart
+│   ├── user_model.dart            # New model for User
+│
+├── providers/
+│   ├── auth_provider.dart
+│   ├── shopping_list_provider.dart
+│
+├── screens/
+│   ├── forgot_password_screen.dart
+│   ├── login_screen.dart
+│   ├── main_screen.dart
+│   ├── registration_screen.dart
+│   ├── settings_screen.dart       # New screen for Settings
+│   ├── shopping_item_screen.dart
+│   ├── shopping_list_screen.dart
+│   ├── search_screen.dart         # New screen for Search
+│
+├── services/
+│   ├── auth_service.dart
+│   ├── shopping_service.dart
+│
+├── utils/
+│   ├── theme.dart
+│   ├── validators.dart
+│
+├── widgets/
+│   ├── custom_button.dart
+│   ├── custom_text_field.dart
+│   ├── loading_indicator.dart
+│   ├── shopping_item_tile.dart
+│   ├── shopping_list_tile.dart
+│   ├── drawer_menu.dart           # New widget for Drawer Menu
+│
+├── main.dart
+├── firebase_options.dart

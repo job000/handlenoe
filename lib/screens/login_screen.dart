@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../services/auth_service.dart';
-import '../utils/validators.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart';
+import '../utils/validators.dart';
 import '../widgets/loading_indicator.dart';
-import 'home_screen.dart';
+import 'registration_screen.dart';
+import 'forgot_password_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -19,29 +20,38 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  final AuthService _authService = AuthService();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   void _login() async {
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
       });
-      User? user = await _authService.signIn(_emailController.text, _passwordController.text);
+      await Provider.of<AuthProvider>(context, listen: false)
+          .signIn(_emailController.text, _passwordController.text);
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
       }
-      if (user != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to sign in')),
-        );
-      }
+    }
+  }
+
+  void _googleSignIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await Provider.of<AuthProvider>(context, listen: false).signInWithGoogle();
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -53,11 +63,12 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: _isLoading
           ? const LoadingIndicator()
-          : Padding(
+          : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 key: _formKey,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     CustomTextField(
                       hintText: 'Email',
@@ -77,6 +88,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     CustomButton(
                       text: 'Login',
                       onPressed: _login,
+                    ),
+                    const SizedBox(height: 16.0),
+                    CustomButton(
+                      text: 'Sign in with Google',
+                      onPressed: _googleSignIn,
+                    ),
+                    const SizedBox(height: 16.0),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const RegistrationScreen()),
+                        );
+                      },
+                      child: const Text('Register'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+                        );
+                      },
+                      child: const Text('Forgot Password?'),
                     ),
                   ],
                 ),

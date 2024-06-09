@@ -1,43 +1,29 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
-import 'registration_screen.dart';
-import '../widgets/custom_button.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../screens/login_screen.dart';
+import '../screens/shopping_list_screen.dart';
+import '../widgets/drawer_menu.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Main Screen'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CustomButton(
-              text: 'Login',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                );
-              },
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        if (authProvider.user == null) {
+          return const LoginScreen();
+        } else {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Shopping List App'),
             ),
-            const SizedBox(height: 16.0),
-            CustomButton(
-              text: 'Register',
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const RegistrationScreen()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+            drawer: const DrawerMenu(), // Removed listId
+            body: const ShoppingListScreen(),
+          );
+        }
+      },
     );
   }
 }
