@@ -65,6 +65,13 @@ class ShoppingListProvider with ChangeNotifier {
 
   Future<void> toggleNotifications(String listId, bool enable) async {
     await _shoppingService.toggleNotifications(listId, enable);
+    notifyListeners();
+  }
+
+  Future<void> toggleAllNotifications(bool enable) async {
+    for (var list in _shoppingLists) {
+      await _shoppingService.toggleNotifications(list.id, enable);
+    }
     _notificationsEnabled = enable;
     notifyListeners();
   }
@@ -73,12 +80,12 @@ class ShoppingListProvider with ChangeNotifier {
     final list = _shoppingLists.firstWhere(
       (list) => list.id == listId,
       orElse: () => ShoppingList(
-        id: '', 
-        name: '', 
-        owner: '', 
-        ownerEmail: '', // Add ownerEmail parameter here
-        items: [], 
-        sharedWith: [], 
+        id: '',
+        name: '',
+        owner: '',
+        ownerEmail: '',
+        items: [],
+        sharedWith: [],
         notificationsEnabled: false,
       ),
     );
