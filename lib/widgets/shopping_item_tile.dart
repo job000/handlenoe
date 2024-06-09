@@ -4,12 +4,19 @@ import 'package:provider/provider.dart';
 import '../models/shopping_item_model.dart';
 import '../providers/shopping_list_provider.dart';
 import '../providers/auth_provider.dart';
+import 'package:intl/intl.dart';
 
 class ShoppingItemTile extends StatelessWidget {
   final ShoppingItem item;
   final String listId;
+  final VoidCallback onTap;
 
-  const ShoppingItemTile({required this.item, required this.listId, Key? key}) : super(key: key);
+  const ShoppingItemTile({
+    required this.item,
+    required this.listId,
+    required this.onTap,
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +44,14 @@ class ShoppingItemTile extends StatelessWidget {
         ],
       ),
       child: ListTile(
-        title: Text(item.name),
+        onTap: onTap,
+        title: Text(
+          item.name,
+          style: TextStyle(
+            decoration: item.isBought ? TextDecoration.lineThrough : null,
+          ),
+        ),
+        subtitle: Text(DateFormat.yMMMd().add_jm().format(item.createdAt.toDate())),
         trailing: Checkbox(
           value: item.isBought,
           onChanged: (value) {

@@ -18,7 +18,7 @@ class ShoppingListProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Stream<QuerySnapshot> getShoppingListsStream(String userId) {
+  Stream<List<ShoppingList>> getShoppingListsStream(String userId) {
     return _shoppingService.getShoppingListsStream(userId);
   }
 

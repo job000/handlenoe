@@ -38,6 +38,7 @@ class ShoppingItemScreen extends StatelessWidget {
                   name: nameController.text,
                   isBought: false,
                   createdBy: authProvider.user?.uid ?? '',
+                  createdAt: Timestamp.now(),
                 );
                 Provider.of<ShoppingListProvider>(context, listen: false).addItemToList(list.id, newItem);
                 Navigator.of(context).pop();
@@ -70,14 +71,38 @@ class ShoppingItemScreen extends StatelessWidget {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
-          final items = snapshot.data!.docs.map((doc) => ShoppingItem.fromDocument(doc)).toList();
+          final items = snapshot.data!.docs.map((doc) => ShoppingItem.fromDocument(doc)).toList()
+            ..sort((a, b) => a.isBought == b.isBought ? a.createdAt.compareTo(b.createdAt) : a.isBought ? 1 : -1);
+
+          if (items.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'No items in this list',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => _addItem(context),
+                    child: const Text('Add First Item'),
+                  ),
+                ],
+              ),
+            );
+          }
+
           return ListView.builder(
             itemCount: items.length,
             itemBuilder: (context, index) {
               final item = items[index];
               return ShoppingItemTile(
                 item: item,
-                listId: list.id, // Added listId to the parameters
+                listId: list.id,
+                onTap: () {
+                  shoppingListProvider.updateItemInList(list.id, item.copyWith(isBought: !item.isBought));
+                },
               );
             },
           );

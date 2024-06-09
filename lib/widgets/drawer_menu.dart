@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -5,17 +7,15 @@ import '../providers/shopping_list_provider.dart';
 import '../screens/settings_screen.dart';
 import '../screens/search_screen.dart';
 import '../screens/share_screen.dart';
-import '../screens/shopping_item_screen.dart';
-import '../models/shopping_list_model.dart';
+import '../screens/shopping_list_screen.dart';
 
 class DrawerMenu extends StatelessWidget {
   const DrawerMenu({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
+    final user = Provider.of<AuthProvider>(context).user;
     final shoppingListProvider = Provider.of<ShoppingListProvider>(context);
-    final user = authProvider.user;
 
     return Drawer(
       child: ListView(
@@ -25,7 +25,7 @@ class DrawerMenu extends StatelessWidget {
             accountName: Text(user?.displayName ?? 'User'),
             accountEmail: Text(user?.email ?? 'Email'),
             currentAccountPicture: CircleAvatar(
-              backgroundImage: NetworkImage(user?.photoURL ?? 'https://example.com/default-avatar.png'),
+              backgroundImage: NetworkImage(user?.photoURL ?? 'https://via.placeholder.com/150'),
             ),
             decoration: BoxDecoration(
               color: Theme.of(context).primaryColor,
@@ -57,7 +57,17 @@ class DrawerMenu extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ShareScreen(listId: '')),
+                MaterialPageRoute(builder: (context) => const ShareScreen(listId: '')), // Provide a valid list ID
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.list),
+            title: const Text('My Lists'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ShoppingListScreen()), // Ensure this screen displays the user's lists
               );
             },
           ),
@@ -67,35 +77,6 @@ class DrawerMenu extends StatelessWidget {
             onTap: () {
               Provider.of<AuthProvider>(context, listen: false).signOut();
               Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-          ),
-          const Divider(),
-          const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text('Shopping Lists'),
-          ),
-          StreamBuilder(
-            stream: shoppingListProvider.getShoppingListsStream(user?.uid ?? ''),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              final shoppingLists = snapshot.data!.docs.map((doc) => ShoppingList.fromDocument(doc)).toList();
-              return Column(
-                children: shoppingLists.map((list) {
-                  return ListTile(
-                    title: Text(list.name),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ShoppingItemScreen(list: list),
-                        ),
-                      );
-                    },
-                  );
-                }).toList(),
-              );
             },
           ),
         ],

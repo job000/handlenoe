@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/shopping_list_provider.dart';
 import '../providers/auth_provider.dart';
-import '../models/shopping_list_model.dart'; // Import the ShoppingList model
+import '../models/shopping_list_model.dart';
 
 class ShareScreen extends StatefulWidget {
   const ShareScreen({Key? key, required String listId}) : super(key: key);
@@ -55,13 +55,13 @@ class _ShareScreenState extends State<ShareScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
-                  StreamBuilder<QuerySnapshot>(
+                  StreamBuilder<List<ShoppingList>>(
                     stream: shoppingListProvider.getShoppingListsStream(userId),
                     builder: (context, snapshot) {
                       if (!snapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
                       }
-                      final shoppingLists = snapshot.data!.docs.map((doc) => ShoppingList.fromDocument(doc)).toList();
+                      final shoppingLists = snapshot.data ?? [];
                       return DropdownButton<String>(
                         hint: const Text('Select a list to share'),
                         value: _selectedListId,
@@ -81,6 +81,7 @@ class _ShareScreenState extends State<ShareScreen> {
                   ),
                   const SizedBox(height: 20),
                   TextField(
+                    keyboardType: TextInputType.emailAddress,
                     controller: _emailController,
                     decoration: const InputDecoration(
                       labelText: 'User Email',

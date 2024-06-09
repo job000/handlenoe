@@ -11,6 +11,13 @@ class ShoppingListTile extends StatelessWidget {
 
   const ShoppingListTile({required this.shoppingList, Key? key}) : super(key: key);
 
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message),
+      duration: const Duration(seconds: 2),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
@@ -21,24 +28,69 @@ class ShoppingListTile extends StatelessWidget {
       key: ValueKey(shoppingList.id),
       startActionPane: ActionPane(
         motion: const DrawerMotion(),
-        extentRatio: 0.25,
+        extentRatio: 0.50,
         children: shoppingList.owner == user?.uid
             ? [
                 SlidableAction(
                   onPressed: (context) {
                     shoppingListProvider.deleteShoppingList(shoppingList.id);
+                    _showSnackBar(context, 'List deleted');
                   },
                   backgroundColor: Colors.red,
                   foregroundColor: Colors.white,
                   icon: Icons.delete,
                   label: 'Delete',
                 ),
+                SlidableAction(
+                  onPressed: (context) {
+                    shoppingListProvider.toggleNotifications(
+                        shoppingList.id, !shoppingList.notificationsEnabled);
+                    _showSnackBar(
+                        context,
+                        shoppingList.notificationsEnabled
+                            ? 'Notifications disabled'
+                            : 'Notifications enabled');
+                  },
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  icon: shoppingList.notificationsEnabled
+                      ? Icons.notifications_off
+                      : Icons.notifications,
+                  label: shoppingList.notificationsEnabled
+                      ? 'Disable Notifications'
+                      : 'Enable Notifications',
+                ),
               ]
-            : [],
+            : [
+                SlidableAction(
+                  onPressed: (context) {
+                    shoppingListProvider.toggleNotifications(
+                        shoppingList.id, !shoppingList.notificationsEnabled);
+                    _showSnackBar(
+                        context,
+                        shoppingList.notificationsEnabled
+                            ? 'Notifications disabled'
+                            : 'Notifications enabled');
+                  },
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  icon: shoppingList.notificationsEnabled
+                      ? Icons.notifications_off
+                      : Icons.notifications,
+                  label: shoppingList.notificationsEnabled
+                      ? 'Disable Notifications'
+                      : 'Enable Notifications',
+                ),
+              ],
       ),
       child: ListTile(
         title: Text(shoppingList.name),
-        subtitle: Text(shoppingList.owner == user?.uid ? 'Owner' : 'Shared with you'),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(shoppingList.owner == user?.uid ? 'Owner: ${shoppingList.ownerEmail}' : 'Shared with you'),
+          ],
+        ),
         onTap: () {
           Navigator.push(
             context,

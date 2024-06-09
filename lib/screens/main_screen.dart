@@ -21,7 +21,7 @@ class MainScreen extends StatelessWidget {
             appBar: AppBar(
               title: const Text('Shopping List App'),
             ),
-            drawer:  const DrawerMenu(), // Removed listId
+            drawer:   DrawerMenu(), // Removed listId
             body: const ShoppingListScreen(),
           );
         }

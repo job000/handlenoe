@@ -5,6 +5,7 @@ import '../widgets/custom_button.dart';
 import '../widgets/custom_text_field.dart';
 import '../utils/validators.dart';
 import '../widgets/loading_indicator.dart';
+import 'shopping_list_screen.dart'; // Import the ShoppingListScreen
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -24,11 +25,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       setState(() {
         _isLoading = true;
       });
-      await Provider.of<AuthProvider>(context, listen: false)
-          .register(_emailController.text, _passwordController.text);
-      setState(() {
-        _isLoading = false;
-      });
+      try {
+        await Provider.of<AuthProvider>(context, listen: false)
+            .register(_emailController.text, _passwordController.text);
+        setState(() {
+          _isLoading = false;
+        });
+        // Show success snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration successful')),
+        );
+        // Navigate to home screen
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const ShoppingListScreen()),
+        );
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+        // Show error snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration failed: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -36,10 +56,29 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     setState(() {
       _isLoading = true;
     });
-    await Provider.of<AuthProvider>(context, listen: false).registerWithGoogle();
-    setState(() {
-      _isLoading = false;
-    });
+    try {
+      await Provider.of<AuthProvider>(context, listen: false).registerWithGoogle();
+      setState(() {
+        _isLoading = false;
+      });
+      // Show success snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration successful')),
+      );
+      // Navigate to home screen
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const ShoppingListScreen()),
+      );
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      // Show error snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registration failed: ${e.toString()}')),
+      );
+    }
   }
 
   @override

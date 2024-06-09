@@ -5,12 +5,14 @@ class ShoppingItem {
   final String name;
   final bool isBought;
   final String createdBy;
+  final Timestamp createdAt; // Add this line
 
   ShoppingItem({
     required this.id,
     required this.name,
     required this.isBought,
     required this.createdBy,
+    required this.createdAt, // Add this line
   });
 
   factory ShoppingItem.fromDocument(DocumentSnapshot doc) {
@@ -20,6 +22,7 @@ class ShoppingItem {
       name: data['name'],
       isBought: data['isBought'],
       createdBy: data['createdBy'],
+      createdAt: data['createdAt'], // Add this line
     );
   }
 
@@ -29,6 +32,7 @@ class ShoppingItem {
       name: data['name'],
       isBought: data['isBought'],
       createdBy: data['createdBy'],
+      createdAt: data['createdAt'], // Add this line
     );
   }
 
@@ -37,6 +41,7 @@ class ShoppingItem {
       'name': name,
       'isBought': isBought,
       'createdBy': createdBy,
+      'createdAt': createdAt, // Add this line
     };
   }
 
@@ -45,12 +50,14 @@ class ShoppingItem {
     String? name,
     bool? isBought,
     String? createdBy,
+    Timestamp? createdAt, // Add this line
   }) {
     return ShoppingItem(
       id: id ?? this.id,
       name: name ?? this.name,
       isBought: isBought ?? this.isBought,
       createdBy: createdBy ?? this.createdBy,
+      createdAt: createdAt ?? this.createdAt, // Add this line
     );
   }
 }
