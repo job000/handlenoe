@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -19,7 +21,7 @@ class MainScreen extends StatelessWidget {
             appBar: AppBar(
               title: const Text('Shopping List App'),
             ),
-            drawer: const DrawerMenu(), // Removed listId
+            drawer:  const DrawerMenu(), // Removed listId
             body: const ShoppingListScreen(),
           );
         }

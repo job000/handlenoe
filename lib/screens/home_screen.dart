@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
               if (mounted) {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => const MainScreen()),
+                  MaterialPageRoute(builder: (context) =>  MainScreen()),
                 );
               }
             },

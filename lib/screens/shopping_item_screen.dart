@@ -32,11 +32,12 @@ class ShoppingItemScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () {
+                final authProvider = Provider.of<AuthProvider>(context, listen: false);
                 final newItem = ShoppingItem(
                   id: '',
                   name: nameController.text,
                   isBought: false,
-                  createdBy: Provider.of<AuthProvider>(context, listen: false).user?.uid ?? '',
+                  createdBy: authProvider.user?.uid ?? '',
                 );
                 Provider.of<ShoppingListProvider>(context, listen: false).addItemToList(list.id, newItem);
                 Navigator.of(context).pop();
@@ -52,7 +53,6 @@ class ShoppingItemScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final shoppingListProvider = Provider.of<ShoppingListProvider>(context);
-    final currentUserId = Provider.of<AuthProvider>(context).user?.uid ?? '';
 
     return Scaffold(
       appBar: AppBar(
@@ -77,9 +77,7 @@ class ShoppingItemScreen extends StatelessWidget {
               final item = items[index];
               return ShoppingItemTile(
                 item: item,
-                listId: list.id,
-                currentUserId: currentUserId,
-                listOwnerId: list.owner,
+                listId: list.id, // Added listId to the parameters
               );
             },
           );

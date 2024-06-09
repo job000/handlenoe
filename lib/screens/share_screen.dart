@@ -6,7 +6,7 @@ import '../providers/auth_provider.dart';
 import '../models/shopping_list_model.dart'; // Import the ShoppingList model
 
 class ShareScreen extends StatefulWidget {
-  const ShareScreen({Key? key}) : super(key: key);
+  const ShareScreen({Key? key, required String listId}) : super(key: key);
 
   @override
   _ShareScreenState createState() => _ShareScreenState();

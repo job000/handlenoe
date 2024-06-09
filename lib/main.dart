@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
               if (authProvider.user == null) {
                 return const LoginScreen();
               } else {
-                return const MainScreen();
+                return MainScreen();
               }
             },
           ),

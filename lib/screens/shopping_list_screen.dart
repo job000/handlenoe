@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/shopping_list_model.dart';
@@ -86,14 +88,6 @@ class _ShoppingListScreenState extends State<ShoppingListScreen> {
               final list = shoppingLists[index];
               return ShoppingListTile(
                 shoppingList: list,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ShoppingItemScreen(list: list),
-                    ),
-                  );
-                },
               );
             },
           );

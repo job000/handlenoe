@@ -1,46 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
 import '../models/shopping_item_model.dart';
 import '../providers/shopping_list_provider.dart';
-import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 
 class ShoppingItemTile extends StatelessWidget {
   final ShoppingItem item;
   final String listId;
-  final String currentUserId;
-  final String listOwnerId;
 
-  const ShoppingItemTile({
-    required this.item,
-    required this.listId,
-    required this.currentUserId,
-    required this.listOwnerId,
-    Key? key,
-  }) : super(key: key);
+  const ShoppingItemTile({required this.item, required this.listId, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: Key(item.id),
-      direction: (currentUserId == item.createdBy || currentUserId == listOwnerId)
-          ? DismissDirection.endToStart
-          : DismissDirection.none,
-      onDismissed: (direction) {
-        Provider.of<ShoppingListProvider>(context, listen: false)
-            .deleteItemFromList(listId, item.id);
-      },
-      background: Container(
-        color: Colors.red,
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: const Icon(Icons.delete, color: Colors.white),
+    final authProvider = Provider.of<AuthProvider>(context);
+    final shoppingListProvider = Provider.of<ShoppingListProvider>(context, listen: false);
+    final user = authProvider.user;
+
+    return Slidable(
+      key: ValueKey(item.id),
+      startActionPane: ActionPane(
+        motion: const DrawerMotion(),
+        extentRatio: 0.25,
+        children: [
+          SlidableAction(
+            onPressed: item.createdBy == user?.uid
+                ? (context) {
+                    shoppingListProvider.deleteItemFromList(listId, item.id);
+                  }
+                : null,
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            icon: Icons.delete,
+            label: 'Delete',
+          ),
+        ],
       ),
       child: ListTile(
         title: Text(item.name),
         trailing: Checkbox(
           value: item.isBought,
-          onChanged: (bool? value) {
-            Provider.of<ShoppingListProvider>(context, listen: false)
-                .updateItemInList(listId, item.copyWith(isBought: value!));
+          onChanged: (value) {
+            shoppingListProvider.updateItemInList(listId, item.copyWith(isBought: value ?? false));
           },
         ),
       ),

@@ -13,9 +13,7 @@ class ShoppingListProvider with ChangeNotifier {
   Future<void> fetchShoppingLists(String userId) async {
     _shoppingLists = await _shoppingService.getShoppingLists(userId);
     for (var list in _shoppingLists) {
-      // Correctly handle the assignment for items
-      final items = await _shoppingService.getItemsForList(list.id);
-      list.items = items.map((item) => item.name).toList(); // Assuming ShoppingItem has a 'name' field
+      list.items = await _shoppingService.getItemsForList(list.id);
     }
     notifyListeners();
   }

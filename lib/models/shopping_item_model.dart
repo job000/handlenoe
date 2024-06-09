@@ -23,6 +23,15 @@ class ShoppingItem {
     );
   }
 
+  factory ShoppingItem.fromMap(Map<String, dynamic> data, String documentId) {
+    return ShoppingItem(
+      id: documentId,
+      name: data['name'],
+      isBought: data['isBought'],
+      createdBy: data['createdBy'],
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'name': name,
@@ -31,7 +40,12 @@ class ShoppingItem {
     };
   }
 
-  ShoppingItem copyWith({String? id, String? name, bool? isBought, String? createdBy}) {
+  ShoppingItem copyWith({
+    String? id,
+    String? name,
+    bool? isBought,
+    String? createdBy,
+  }) {
     return ShoppingItem(
       id: id ?? this.id,
       name: name ?? this.name,
