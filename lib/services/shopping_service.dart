@@ -1,10 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:rxdart/rxdart.dart';
+import '../models/notification_settings_model.dart';
 import '../models/shopping_list_model.dart';
 import '../models/shopping_item_model.dart';
 
 class ShoppingService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  Future<void> setNotificationSettings(NotificationSettings settings) {
+    return _db
+        .collection('users')
+        .doc(settings.userId)
+        .collection('notifications')
+        .doc(settings.listId)
+        .set(settings.toMap());
+  }
+
+  Stream<NotificationSettings> getNotificationSettings(String userId, String listId) {
+    return _db
+        .collection('users')
+        .doc(userId)
+        .collection('notifications')
+        .doc(listId)
+        .snapshots()
+        .map((snapshot) {
+          if (snapshot.exists) {
+            return NotificationSettings.fromMap(snapshot.data()!);
+          } else {
+            return NotificationSettings(userId: userId, listId: listId, notificationsEnabled: false);
+          }
+        });
+  }
 
   Future<List<ShoppingList>> getShoppingLists(String userId) async {
     final ownedListsSnapshot = await _db

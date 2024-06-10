@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/shopping_list_provider.dart';
 import '../providers/theme_provider.dart';
+import '../services/shopping_service.dart';
+import '../models/notification_settings_model.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -10,7 +12,8 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final shoppingListProvider = Provider.of<ShoppingListProvider>(context);
     final themeProvider = Provider.of<ThemeProvider>(context);
-    bool notificationsEnabled = shoppingListProvider.notificationsEnabled; // Get the actual state
+    final firestoreService = Provider.of<ShoppingService>(context, listen: false);
+    final userId = 'current_user_id'; // Get current user ID from auth provider
 
     return WillPopScope(
       onWillPop: () async {
@@ -27,7 +30,7 @@ class SettingsScreen extends StatelessWidget {
             children: [
               SwitchListTile(
                 title: const Text('Enable Notifications for All Lists'),
-                value: notificationsEnabled,
+                value: shoppingListProvider.notificationsEnabled,
                 onChanged: (bool value) {
                   shoppingListProvider.toggleAllNotifications(value);
                 },
@@ -46,11 +49,27 @@ class SettingsScreen extends StatelessWidget {
                   itemCount: shoppingListProvider.shoppingLists.length,
                   itemBuilder: (context, index) {
                     final list = shoppingListProvider.shoppingLists[index];
-                    return SwitchListTile(
-                      title: Text(list.name),
-                      value: list.notificationsEnabled,
-                      onChanged: (bool value) {
-                        shoppingListProvider.toggleNotifications(list.id, value);
+                    return StreamBuilder<NotificationSettings>(
+                      stream: firestoreService.getNotificationSettings(userId, list.id),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        }
+
+                        final settings = snapshot.data;
+
+                        return SwitchListTile(
+                          title: Text(list.name),
+                          value: settings?.notificationsEnabled ?? false,
+                          onChanged: (bool value) {
+                            final newSettings = NotificationSettings(
+                              userId: userId,
+                              listId: list.id,
+                              notificationsEnabled: value,
+                            );
+                            firestoreService.setNotificationSettings(newSettings);
+                          },
+                        );
                       },
                     );
                   },

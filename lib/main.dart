@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/shopping_list_provider.dart';
 import 'providers/theme_provider.dart';
+import 'services/shopping_service.dart';
+import 'services/firebase_messaging_service.dart';
 import 'screens/main_screen.dart';
 import 'screens/login_screen.dart';
 
@@ -13,12 +15,17 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  final firebaseMessagingService = FirebaseMessagingService();
+  await firebaseMessagingService.initialize();
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ShoppingListProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        Provider(create: (_) => ShoppingService()),
       ],
       child: const MyApp(),
     ),
