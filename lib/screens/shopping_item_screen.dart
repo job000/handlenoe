@@ -14,13 +14,17 @@ class ShoppingItemScreen extends StatelessWidget {
 
   void _addItem(BuildContext context) {
     final nameController = TextEditingController();
+    final focusNode = FocusNode();
+
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Add Item'),
           content: TextField(
+            autofocus: true,
             controller: nameController,
+            focusNode: focusNode,
             decoration: const InputDecoration(hintText: 'Item Name'),
           ),
           actions: [
@@ -31,6 +35,7 @@ class ShoppingItemScreen extends StatelessWidget {
               child: const Text('Cancel'),
             ),
             TextButton(
+              
               onPressed: () {
                 final authProvider = Provider.of<AuthProvider>(context, listen: false);
                 final newItem = ShoppingItem(
@@ -48,7 +53,10 @@ class ShoppingItemScreen extends StatelessWidget {
           ],
         );
       },
-    );
+    ).then((_) {
+      // Ensure focus is requested after the dialog is shown
+      focusNode.requestFocus();
+    });
   }
 
   @override

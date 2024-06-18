@@ -16,43 +16,52 @@ class ShoppingListScreen extends StatefulWidget {
 class _ShoppingListScreenState extends State<ShoppingListScreen> {
   void _addShoppingList(BuildContext context) {
     final nameController = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add Shopping List'),
-          content: TextField(
-            controller: nameController,
-            decoration: const InputDecoration(hintText: 'List Name'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancel'),
+    final focusNode = FocusNode();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Add Shopping List'),
+            content: TextField(
+              controller: nameController,
+              focusNode: focusNode,
+              autofocus: true,
+              decoration: const InputDecoration(hintText: 'List Name'),
             ),
-            TextButton(
-              onPressed: () {
-                final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                final newList = ShoppingList(
-                  id: '',
-                  name: nameController.text,
-                  owner: authProvider.user?.uid ?? '',
-                  ownerEmail: authProvider.user?.email ?? '',
-                  sharedWith: [],
-                  notificationsEnabled: false,
-                  items: [],
-                );
-                Provider.of<ShoppingListProvider>(context, listen: false).addShoppingList(newList);
-                Navigator.of(context).pop();
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                  final newList = ShoppingList(
+                    id: '',
+                    name: nameController.text,
+                    owner: authProvider.user?.uid ?? '',
+                    ownerEmail: authProvider.user?.email ?? '',
+                    sharedWith: [],
+                    notificationsEnabled: false,
+                    items: [],
+                  );
+                  Provider.of<ShoppingListProvider>(context, listen: false).addShoppingList(newList);
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Add'),
+              ),
+            ],
+          );
+        },
+      ).then((_) {
+        // Ensure focus is requested after the dialog is shown
+        focusNode.requestFocus();
+      });
+    });
   }
 
   @override
